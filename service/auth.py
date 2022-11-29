@@ -12,6 +12,7 @@ from dao.auth import AuthDAO
 from dao.users import UserDAO
 
 
+
 def generate_jwt(user_obj):
     min30 = datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
     user_obj["exp"] = calendar.timegm(min30.timetuple())
@@ -73,36 +74,13 @@ def auth_required(func):
     return wrappers
 
 
-def admin_required(func):
-    def wrappers(*args, **kwargs):
-        data = request.headers
-
-        if 'Authorization' not in data:
-            abort(401)
-
-        token_data = data.get('Authorization')
-
-        token = token_data.split('Bearer ')[-1]
-
-        try:
-            user_data = jwt.decode(token, JWT_SECRET, algorithms=JWT_ALGORITHM)
-            if user_data.get("role") != 'admin':
-                abort(403)
-            return func(*args, **kwargs)
-        except Exception as e:
-            print("Admin authorisation error", e)
-            abort(403)
-
-    return wrappers
-
-
 class AuthService:
     def __init__(self, dao: AuthDAO):
         self.dao = dao
 
     def get_token(self, user_data):
-        user_name = user_data.get("username")
-        user_db = self.dao.get_by_user(user_name)
+        user_email = user_data.get("email")
+        user_db = self.dao.get_by_user(user_email)
 
         if user_db is None:
             return "User is not exist!", 403
@@ -111,3 +89,7 @@ class AuthService:
 
         token_data = generate_jwt(user_data)
         return token_data
+
+
+
+

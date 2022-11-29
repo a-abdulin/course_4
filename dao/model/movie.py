@@ -18,9 +18,9 @@ class Movie(db.Model):
 
 
 class MovieSchema(Schema):
-    id = fields.Int()
-    title = fields.Str()
-    description = fields.Str()
+    id = fields.Int(required=True)
+    title = fields.Str(required=True)
+    description = fields.Str(required=True)
     trailer = fields.Str()
     year = fields.Int()
     rating = fields.Float()

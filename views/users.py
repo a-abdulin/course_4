@@ -16,10 +16,11 @@ class UsersView(Resource):
         output_us = users_schema.dump(all_users)
         return output_us
 
-    def post(self):
-        json_data = request.json
-        user = user_service.create(json_data)
-        return "Ok", 201, {"new_user": f"/user/{user.id}"}
+
+    def patch(self):
+        user_new = request.json
+        user = user_service.update(user_new)
+        return "Ok", 201
 
 
 @users_ns.route('/<int:uid>')
@@ -29,8 +30,6 @@ class UserView(Resource):
         res = user_schema.dump(user)
         return res
 
-    def put(self, uid):
-        pass
 
     def delete(self, uid):
         user_data = user_service.delete(uid)
@@ -38,4 +37,10 @@ class UserView(Resource):
         return res, 204
 
 
+@users_ns.route('/password/')
+class UserPasswordView(Resource):
+    def put(self):
+        user_data = request.json
+        user_new = user_service.password_update(user_data)
+        return user_new.email, 201
 

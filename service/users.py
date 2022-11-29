@@ -1,5 +1,5 @@
 from dao.users import UserDAO
-from service.auth import get_hash
+from service.auth import get_hash, password_check
 
 
 class UserService:
@@ -22,4 +22,21 @@ class UserService:
 
     def delete(self, uid):
         self.dao.delete(uid)
+
+
+    def password_update(self, user_data):
+        user_email = user_data.get("email")
+        user_db = self.dao.get_by_email(user_email)
+
+        password_old = user_data.get("password_1")
+        password_new_hash = get_hash(user_data.get("password_2"))
+
+        if user_db is None:
+            return "User is not exist!", 403
+        elif not password_check(password_old, user_db.password):
+            return "Password is incorrect", 403
+
+        user = self.dao.password_update(user_db, password_new_hash)
+
+        return user
 
